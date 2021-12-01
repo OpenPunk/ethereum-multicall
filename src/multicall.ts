@@ -17,6 +17,12 @@ import {
 } from './models';
 import { Utils } from './utils';
 
+let blockTag:any = null
+
+export function setBlockTag(tag: any) {
+  blockTag = tag
+}
+
 export class Multicall {
   private readonly ABI = [
     {
@@ -412,13 +418,19 @@ export class Multicall {
     if (this._options.tryAggregate) {
       const contractResponse = (await contract.callStatic.tryBlockAndAggregate(
         false,
-        this.mapCallContextToMatchContractFormat(calls)
+        this.mapCallContextToMatchContractFormat(calls), 
+        {
+          blockTag: blockTag || 'latest'
+        }
       )) as AggregateContractResponse;
 
       return this.buildUpAggregateResponse(contractResponse, calls);
     } else {
       const contractResponse = (await contract.callStatic.aggregate(
-        this.mapCallContextToMatchContractFormat(calls)
+        this.mapCallContextToMatchContractFormat(calls),
+        {
+          blockTag: blockTag || 'latest'
+        }        
       )) as AggregateContractResponse;
 
       return this.buildUpAggregateResponse(contractResponse, calls);
