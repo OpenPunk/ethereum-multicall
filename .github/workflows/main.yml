@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: '12.x'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@OpenPunk'
+          scope: '@openpunk'
           
           
  
@@ -23,7 +23,7 @@ jobs:
       - run: |
           npm i
           npm run build
-          echo "registry=https://npm.pkg.github.com/@OpenPunk" > .npmrc          
+          echo "registry=https://npm.pkg.github.com/@openpunk" > .npmrc          
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
