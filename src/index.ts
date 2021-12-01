@@ -5,4 +5,4 @@ export {
   ContractCallReturnContext,
 } from './models';
 export * from './models/multicall-options';
-export { Multicall } from './multicall';
+export { Multicall, setBlockTag } from './multicall';
