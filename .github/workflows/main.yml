@@ -23,6 +23,7 @@ jobs:
       - run: |
           npm i
           npm run build
+          echo "registry=https://npm.pkg.github.com/@OpenPunk" > .npmrc          
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
