@@ -17,12 +17,6 @@ import {
 } from './models';
 import { Utils } from './utils';
 
-let blockTag:any = null
-
-export function setBlockTag(tag: any) {
-  blockTag = tag
-}
-
 export class Multicall {
   private readonly ABI = [
     {
@@ -140,14 +134,18 @@ export class Multicall {
    * @param calls The calls
    */
   public async call(
-    contractCallContexts: ContractCallContext[] | ContractCallContext
+    contractCallContexts: ContractCallContext[] | ContractCallContext,
+    options:{
+      blockTag?: string | number,
+    } = {}
   ): Promise<ContractCallResults> {
     if (!Array.isArray(contractCallContexts)) {
       contractCallContexts = [contractCallContexts];
     }
 
     const aggregateResponse = await this.execute(
-      this.buildAggregateCallContext(contractCallContexts)
+      this.buildAggregateCallContext(contractCallContexts),
+      options.blockTag || 'latest'
     );
 
     const returnObject: ContractCallResults = {
@@ -331,14 +329,15 @@ export class Multicall {
    * @param calls The calls
    */
   private async execute(
-    calls: AggregateCallContext[]
+    calls: AggregateCallContext[],
+    blockTag: string | number,
   ): Promise<AggregateResponse> {
     switch (this._executionType) {
       case ExecutionType.web3:
-        return await this.executeWithWeb3(calls);
+        return await this.executeWithWeb3(calls, blockTag);
       case ExecutionType.ethers:
       case ExecutionType.customHttp:
-        return await this.executeWithEthersOrCustom(calls);
+        return await this.executeWithEthersOrCustom(calls, blockTag);
       default:
         throw new Error(`${this._executionType} is not defined`);
     }
@@ -349,7 +348,8 @@ export class Multicall {
    * @param calls The calls context
    */
   private async executeWithWeb3(
-    calls: AggregateCallContext[]
+    calls: AggregateCallContext[],
+    blockTag: string | number
   ): Promise<AggregateResponse> {
     const web3 = this.getTypedOptions<MulticallOptionsWeb3>().web3Instance;
     const networkId = await web3.eth.net.getId();
@@ -357,6 +357,8 @@ export class Multicall {
       this.ABI,
       this.getContractBasedOnNetwork(networkId)
     );
+
+    contract.defaultBlock = blockTag || 'latest'
 
     if (this._options.tryAggregate) {
       const contractResponse = (await contract.methods
@@ -389,7 +391,8 @@ export class Multicall {
    * @param calls The calls
    */
   private async executeWithEthersOrCustom(
-    calls: AggregateCallContext[]
+    calls: AggregateCallContext[],
+    blockTag: string | number
   ): Promise<AggregateResponse> {
     let ethersProvider = this.getTypedOptions<MulticallOptionsEthers>()
       .ethersProvider;

@@ -31,9 +31,4 @@ export interface ContractCallContext<TContext = any> {
    */
   // tslint:disable-next-line: no-any
   context?: TContext | undefined;
-  
-  /**
-   * latest | pending | 0x00000..
-   */  
-  blockTag?: string | number
 }
